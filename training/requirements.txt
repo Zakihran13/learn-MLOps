@@ -1,0 +1,31 @@
+# Training Layer Requirements
+# Install with: pip install -r training/requirements.txt
+
+# Core ML/DL
+torch==2.0.0
+transformers==4.30.0
+scikit-learn==1.2.0
+pandas==2.0.0
+numpy==1.24.0
+
+# MLflow for tracking
+mlflow==2.3.0
+
+# Data processing
+pyspark==3.3.0
+
+# Database
+psycopg2-binary==2.9.6
+sqlalchemy==2.0.0
+
+# Utilities
+tqdm==4.65.0
+pyyaml==6.0
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.3.0
+pytest-cov==4.1.0
+
+# Logging
+loguru==0.7.0

@@ -1,0 +1,69 @@
+# Data Validation Rules
+# Used by: data/scripts/validation_module.py
+
+validation_checks:
+  # Strict schema validation (no extra/missing columns)
+  schema_strict: true
+  
+  # Missing value detection
+  missing_values:
+    check_enabled: true
+    threshold: 0.10  # Alert if missing % > 10%
+    column_tolerances:
+      text: 0.05     # Text column can have max 5% missing
+      label: 0.01    # Label column must have < 1% missing
+  
+  # Anomaly detection using z-score
+  anomaly_detection:
+    check_enabled: true
+    method: "zscore"  # or "iqr"
+    threshold_sigma: 3.0  # Flag if |z-score| > 3
+    numeric_columns:
+      - length
+      - word_count
+  
+  # Cardinality check (detect new categories)
+  cardinality:
+    check_enabled: true
+    method: "percentage_change"
+    threshold: 0.05  # Alert if category change > 5%
+    categorical_columns:
+      - label
+      - source
+  
+  # Data type validation
+  data_types:
+    check_enabled: true
+    strict: false  # Allow type coercion
+    expected_types:
+      text: "string"
+      label: "string"
+      timestamp: "datetime"
+
+# Expected schema
+expected_schema:
+  text: "string"
+  label: "string"
+  source: "string"
+  timestamp: "datetime"
+
+# Audit trail
+audit:
+  log_all_validations: true
+  log_file: "logs/validation_audit.log"
+  save_failed_records: true
+  failed_records_table: "validation_failures"
+
+# Alert thresholds
+alerts:
+  schema_drift_alert: true
+  missing_value_alert: true
+  anomaly_alert: true
+  cardinality_alert: true
+  
+# Handling strategies
+handling:
+  on_schema_drift: "alert"      # 'skip', 'alert', 'error'
+  on_missing_values: "alert"
+  on_anomalies: "flag"          # 'skip', 'flag', 'error'
+  on_cardinality_change: "alert"

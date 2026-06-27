@@ -1,0 +1,40 @@
+# Serving Layer Requirements
+# Install with: pip install -r serving/requirements.txt
+
+# FastAPI for REST API
+fastapi==0.95.0
+uvicorn==0.21.0
+pydantic==1.10.0
+
+# MLflow for model loading
+mlflow==2.3.0
+
+# Database
+psycopg2-binary==2.9.6
+sqlalchemy==2.0.0
+
+# Data processing
+pandas==2.0.0
+numpy==1.24.0
+
+# ML libraries
+torch==2.0.0
+transformers==4.30.0
+scikit-learn==1.2.0
+
+# Statistics for drift detection
+scipy==1.10.0
+statsmodels==0.13.0
+
+# Async utilities
+aiofiles==23.1.0
+
+# Utilities
+pyyaml==6.0
+python-dotenv==1.0.0
+loguru==0.7.0
+
+# Testing
+pytest==7.3.0
+pytest-asyncio==0.21.0
+httpx==0.24.0

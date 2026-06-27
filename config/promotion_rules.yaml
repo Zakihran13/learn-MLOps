@@ -1,0 +1,47 @@
+# Model Promotion Rules
+# Used by: registry/promotion_pipeline.py
+
+promotion:
+  # F1-score comparison
+  f1_score:
+    use_comparison: true
+    threshold: 0.75          # Minimum F1-score required
+    delta_min_improvement: -0.02  # Allow up to 2% drop from baseline
+    direction: "higher_is_better"
+  
+  # Latency constraint
+  latency:
+    use_comparison: true
+    threshold_ms: 100        # Maximum inference latency in milliseconds
+    
+  # Precision and recall
+  precision:
+    use_comparison: true
+    threshold: 0.70
+    
+  recall:
+    use_comparison: true
+    threshold: 0.70
+
+validation:
+  # All validation tests must pass
+  min_passing_tests: 5
+  min_validation_samples: 100
+  
+  # If all comparison and validation pass
+  auto_promote_to_staging: true
+  
+  # Manual approval gate before production
+  require_manual_approval_for_production: true
+  
+  # Rollback automatic if performance degrades
+  auto_rollback_on_degradation: true
+  performance_degradation_threshold: 0.05  # 5% drop triggers rollback
+
+decision_log:
+  save_to_file: true
+  log_file: "logs/promotion_decisions.json"
+  
+fallback:
+  if_comparison_fails: "reject"  # 'reject' or 'manual_review'
+  if_validation_fails: "reject"

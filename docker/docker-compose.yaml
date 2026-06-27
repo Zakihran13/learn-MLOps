@@ -1,0 +1,92 @@
+# Docker Compose Configuration for MLOps Stack
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database - Single source of truth for all data
+  postgres:
+    image: postgres:14-alpine
+    container_name: mlops-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mlops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mlops-network
+
+  # pgAdmin - PostgreSQL Admin UI (optional but helpful)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: mlops-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - mlops-network
+
+  # MLflow Server - Experiment tracking and model registry
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    container_name: mlops-mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow_data:/mlflow/data
+      - ./mlflow_artifacts:/mlflow/artifacts
+    environment:
+      MLFLOW_TRACKING_URI: http://localhost:5000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - postgres
+    networks:
+      - mlops-network
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////mlflow/data/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+      --host 0.0.0.0
+      --port 5000
+
+  # Optional: Jupyter Notebook for exploration
+  jupyter:
+    image: jupyter/minimal-notebook:latest
+    container_name: mlops-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+    depends_on:
+      - postgres
+      - mlflow
+    networks:
+      - mlops-network
+    command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+
+volumes:
+  postgres_data:
+
+networks:
+  mlops-network:
+    driver: bridge

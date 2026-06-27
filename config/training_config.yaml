@@ -1,0 +1,37 @@
+# Training Configuration
+# Used by: training/train.py
+
+model:
+  model_name: "distilbert-base-uncased"
+  num_labels: 2
+  max_seq_length: 128
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  freeze_layers: 8  # Freeze first N layers for transfer learning
+
+training:
+  learning_rate: 2e-5
+  batch_size: 32
+  num_epochs: 3
+  warmup_steps: 500
+  max_grad_norm: 1.0
+  weight_decay: 0.01
+  
+reproducibility:
+  seed: 42
+  
+optimization:
+  optimizer: "adamw"
+  use_amp: false  # Automatic Mixed Precision
+  gradient_accumulation_steps: 1
+
+data:
+  data_version: "v1.0"  # Track data version
+  validation_split: 0.2
+  test_split: 0.1
+  
+logging:
+  log_level: "INFO"
+  log_file: "logs/training.log"
+  mlflow_experiment_name: "sentiment-classifier-v1"
+  save_checkpoint_every: 1  # Save checkpoint every N epochs

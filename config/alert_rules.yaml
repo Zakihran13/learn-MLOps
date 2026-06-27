@@ -1,0 +1,94 @@
+# Alert Rules for Monitoring & Drift Detection
+# Used by: serving/alert_module.py and serving/drift_monitor.py
+
+drift_detection:
+  # Kolmogorov-Smirnov test for distribution drift
+  ks_test:
+    enabled: true
+    p_value_threshold: 0.05      # Alert if p < 0.05
+    baseline_dataset: "training"
+    
+  # Population Stability Index for categorical drift
+  psi:
+    enabled: true
+    threshold: 0.1                # Alert if PSI > 0.1
+    
+  # Check interval
+  check_every_n_inferences: 100
+  check_interval_hours: 1
+  
+  # Features to monitor
+  monitored_features:
+    - token_ids
+    - token_counts
+    - text_length
+  
+  # Actions on drift detection
+  on_drift_detected:
+    log_alert: true
+    trigger_retraining: true
+    alert_severity: "HIGH"
+
+performance_monitoring:
+  # F1-score monitoring (sliding window)
+  f1_score:
+    enabled: true
+    window_size: 500       # Monitor last 500 predictions
+    threshold: 0.70        # Alert if F1 < 0.70
+    alert_severity: "HIGH"
+  
+  # Confidence distribution
+  confidence:
+    enabled: true
+    alert_if_avg_below: 0.60
+    alert_severity: "MEDIUM"
+  
+  # Error rate
+  error_rate:
+    enabled: true
+    threshold: 0.05        # Alert if error rate > 5%
+    alert_severity: "CRITICAL"
+  
+  # Latency monitoring (p95)
+  latency_p95:
+    enabled: true
+    threshold_ms: 150      # Alert if p95 latency > 150ms
+    alert_severity: "MEDIUM"
+
+infrastructure_monitoring:
+  # Database connectivity
+  db_health:
+    enabled: true
+    check_interval_seconds: 30
+    alert_severity: "CRITICAL"
+  
+  # Model loading
+  model_load:
+    enabled: true
+    check_interval_seconds: 60
+    alert_severity: "CRITICAL"
+  
+  # API health
+  api_health:
+    enabled: true
+    check_interval_seconds: 10
+    alert_severity: "HIGH"
+
+alerting:
+  # Alert channels
+  log_to_database: true
+  log_to_file: true
+  log_file: "logs/alerts.log"
+  
+  # Alert history
+  retention_days: 30
+  
+  # Acknowledgment
+  require_acknowledgment: false
+  auto_escalate_unacked: 3600  # Escalate after 1 hour if unacked
+
+# Fallback behaviors
+fallback:
+  if_baseline_unavailable: "use_global_mean"
+  if_monitoring_fails: "alert_and_continue"
+  min_samples_for_monitoring: 50

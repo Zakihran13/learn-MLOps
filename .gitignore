@@ -216,3 +216,21 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# MLOps-specific
+mlruns/
+.mlflow/
+models/
+*.pth
+*.pt
+*.onnx
+*.h5
+data/raw/
+data/processed/
+!data/raw/.gitkeep
+logs/
+*.db
+*.sqlite
+artifacts/
+.cache/
+scratch/
